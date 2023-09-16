@@ -1,9 +1,27 @@
+String input;
+ 
 void setup() {
-  // put your setup code here, to run once:
-
+    Serial.begin(9600); 
+    delay(2000);  
+ 
+    Serial.println("Type something!");
 }
-
+ 
 void loop() {
-  // put your main code here, to run repeatedly:
+    if(Serial.available()){
+        input = Serial.readStringUntil('\n');
+          Serial.print("You typed: " );
+          Serial.println(input);
+      
+      int WordLength = input.length() + 1;  
+      char WordArray[WordLength]; 
 
+      input.toCharArray(WordArray, WordLength); 
+
+      for(int i = 0; i < WordLength; i++)
+      {
+        Serial.println(WordArray[i]); 
+      }
+    
+    }
 }
