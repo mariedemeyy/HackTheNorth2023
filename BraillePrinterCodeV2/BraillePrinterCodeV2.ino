@@ -1,6 +1,29 @@
 #include <ArxContainer.h>
+#include <TinyStepper_28BYJ_48.h>
 String input;
 
+// TODO: MOTOR0
+// const int MOTOR0_IN1_PIN = 1;
+// const int MOTOR0_IN2_PIN = 2;
+// const int MOTOR0_IN3_PIN = 3;
+// const int MOTOR0_IN4_PIN = 4;
+
+const int MOTOR1_IN1_PIN = 5;
+const int MOTOR1_IN2_PIN = 6;
+const int MOTOR1_IN3_PIN = 7;
+const int MOTOR1_IN4_PIN = 8;
+
+const int MOTOR2_IN1_PIN = 9;
+const int MOTOR2_IN2_PIN = 10;
+const int MOTOR2_IN3_PIN = 11;
+const int MOTOR2_IN4_PIN = 12;
+
+const int STEPS_PER_REVOLUTION = 2048;
+
+// Create the stepper motor object
+// TinyStepper_28BYJ_48 stepper0;
+TinyStepper_28BYJ_48 stepper1;
+TinyStepper_28BYJ_48 stepper2;
 
 // Map with a selection of letters available.
 // Letters that are commonly used in the English language where
@@ -38,6 +61,12 @@ arx::map<char, String> mp {
 void setup() {
     Serial.begin(9600); 
     Serial.println("");
+    
+    // Setup motor
+    // stepper0.connectToPins(MOTOR0_IN1_PIN, MOTOR0_IN2_PIN, MOTOR0_IN3_PIN, MOTOR0_IN4_PIN);
+    stepper1.connectToPins(MOTOR1_IN1_PIN, MOTOR1_IN2_PIN, MOTOR1_IN3_PIN, MOTOR1_IN4_PIN);
+    stepper2.connectToPins(MOTOR2_IN1_PIN, MOTOR2_IN2_PIN, MOTOR2_IN3_PIN, MOTOR2_IN4_PIN);
+
     delay(1000);
     Serial.println("Enter a 5 letter word in lower case to print.");
 }
@@ -156,5 +185,36 @@ void loop() {
           Serial.print(' ');
         }
       }
+      // WORK OUT MOVEMENT PATTERNS
+
+      
+      // MOTOR0
+      // stepper0.setSpeedInStepsPerSecond(256);
+      // stepper0.setAccelerationInStepsPerSecondPerSecond(512);
+      // stepper0.moveRelativeInSteps(2048);
+      // delay(1000);
+      // stepper0.moveRelativeInSteps(-2048);
+      // delay(1000);
+
+      // MOTOR1
+      stepper1.setSpeedInStepsPerSecond(256);
+      stepper1.setAccelerationInStepsPerSecondPerSecond(512);
+      stepper1.moveRelativeInSteps(2048);
+      delay(1000);
+      stepper1.moveRelativeInSteps(-2048);
+      delay(1000);
+
+      // MOTOR2
+      stepper2.setSpeedInStepsPerSecond(256);
+      stepper2.setAccelerationInStepsPerSecondPerSecond(512);
+      stepper2.moveRelativeInSteps(2048);
+      delay(1000);
+      stepper2.moveRelativeInSteps(-2048);
+      delay(1000);
+
+      // stepper1.setSpeedInStepsPerSecond(500);
+      // stepper1.setAccelerationInStepsPerSecondPerSecond(1000);
+      // stepper1.moveRelativeInSteps(2048 * 5);
+      // delay(2000);
     } 
 }
