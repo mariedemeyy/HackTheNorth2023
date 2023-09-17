@@ -3,10 +3,10 @@
 String input;
 
 // TODO: MOTOR0
-// const int MOTOR0_IN1_PIN = 1;
-// const int MOTOR0_IN2_PIN = 2;
-// const int MOTOR0_IN3_PIN = 3;
-// const int MOTOR0_IN4_PIN = 4;
+const int MOTOR0_IN1_PIN = 1;
+const int MOTOR0_IN2_PIN = 2;
+const int MOTOR0_IN3_PIN = 3;
+const int MOTOR0_IN4_PIN = 4;
 
 const int MOTOR1_IN1_PIN = 5;
 const int MOTOR1_IN2_PIN = 6;
@@ -21,7 +21,7 @@ const int MOTOR2_IN4_PIN = 12;
 const int STEPS_PER_REVOLUTION = 2048;
 
 // Create the stepper motor object
-// TinyStepper_28BYJ_48 stepper0;
+TinyStepper_28BYJ_48 stepper0;
 TinyStepper_28BYJ_48 stepper1;
 TinyStepper_28BYJ_48 stepper2;
 
@@ -63,7 +63,7 @@ void setup() {
     Serial.println("");
     
     // Setup motor
-    // stepper0.connectToPins(MOTOR0_IN1_PIN, MOTOR0_IN2_PIN, MOTOR0_IN3_PIN, MOTOR0_IN4_PIN);
+    stepper0.connectToPins(MOTOR0_IN1_PIN, MOTOR0_IN2_PIN, MOTOR0_IN3_PIN, MOTOR0_IN4_PIN);
     stepper1.connectToPins(MOTOR1_IN1_PIN, MOTOR1_IN2_PIN, MOTOR1_IN3_PIN, MOTOR1_IN4_PIN);
     stepper2.connectToPins(MOTOR2_IN1_PIN, MOTOR2_IN2_PIN, MOTOR2_IN3_PIN, MOTOR2_IN4_PIN);
 
@@ -124,43 +124,25 @@ void loop() {
         
         leftCol += incrementor;
         rightCol += incrementor;
-        // for(int j = 0; j < WordLength*2; j += incrementor) {
-        //   Serial.println(j);
-        //   leftCol = j;
-        //   rightCol = j + 1;
-
-        //   // Get 0 and 3 for topRow
-        //   topRow[leftCol] = brailleCode.charAt(3);
-        //   topRow[rightCol] = brailleCode.charAt(0);
-
-        //   // Get 1 and 4 for middleRow
-        //   middleRow[leftCol] = brailleCode.charAt(4);
-        //   middleRow[rightCol] = brailleCode.charAt(1);
-
-        //   // Get 2 and 5 for bottomRow
-        //   bottomRow[leftCol] = brailleCode.charAt(5);
-        //   bottomRow[rightCol] = brailleCode.charAt(2);
-
-        // }
       }
       // MOTOR STUFF, USE THE ARRAYS
+      // QUICK DEBUG STATEMENTS
       Serial.println("topRow");
       for(int i = 0; i < 10; i++) {
         Serial.print(topRow[i]);
       }
-
       Serial.println("");
       Serial.println("middleRow");
       for(int i = 0; i < 10; i++) {
         Serial.print(middleRow[i]);
       }
-
       Serial.println("");
       Serial.println("bottomRow");
       for(int i = 0; i < 10; i++) {
         Serial.print(bottomRow[i]);
       }
 
+      // PRINT IN MIRRORED BRAILLE
       Serial.println("");
       for(int i = 0; i < 10; i++) {
         if(topRow[i] == '1') {
@@ -185,36 +167,83 @@ void loop() {
           Serial.print(' ');
         }
       }
-      // WORK OUT MOVEMENT PATTERNS
 
-      
       // MOTOR0
-      // stepper0.setSpeedInStepsPerSecond(256);
-      // stepper0.setAccelerationInStepsPerSecondPerSecond(512);
-      // stepper0.moveRelativeInSteps(2048);
-      // delay(1000);
-      // stepper0.moveRelativeInSteps(-2048);
-      // delay(1000);
+      stepper0.setSpeedInStepsPerSecond(256);
+      stepper0.setAccelerationInStepsPerSecondPerSecond(512);
 
-      // MOTOR1
+      // MOTOR1 (Z-DIRECTION)
       stepper1.setSpeedInStepsPerSecond(256);
       stepper1.setAccelerationInStepsPerSecondPerSecond(512);
-      stepper1.moveRelativeInSteps(2048);
-      delay(1000);
-      stepper1.moveRelativeInSteps(-2048);
-      delay(1000);
 
-      // MOTOR2
+      // MOTOR2 (X-DIRECTION)
       stepper2.setSpeedInStepsPerSecond(256);
       stepper2.setAccelerationInStepsPerSecondPerSecond(512);
-      stepper2.moveRelativeInSteps(2048);
-      delay(1000);
-      stepper2.moveRelativeInSteps(-2048);
-      delay(1000);
 
-      // stepper1.setSpeedInStepsPerSecond(500);
-      // stepper1.setAccelerationInStepsPerSecondPerSecond(1000);
-      // stepper1.moveRelativeInSteps(2048 * 5);
-      // delay(2000);
+      // WORK OUT MOVEMENT PATTERNS
+      // TOP ROW
+      for(int i = 0; i < 10; i++) {
+        if(topRow[i] == '1') {
+          // MOVE Z MOTOR
+          Serial.println("z-direction movement");
+          stepper1.moveRelativeInSteps(1024);
+        } else {
+          Serial.println("No z-direction movement");
+        }
+        // MOVE X MOTOR, AS LONG AS IT IS NOT LAST DOT
+        if(i != 9) {
+          Serial.println("x-direction movement");
+          stepper2.moveRelativeInSteps(1024);
+        } else {
+          Serial.println("No x-direction movement");
+        }
+      }
+      // MOVE Y MOTOR TO THE MIDDLE ROW
+      Serial.println("y-direction movement");
+      // stepper0.moveRelativeInSteps(2048);
+
+      // MIDDLE ROW
+      for(int i = 9; i >=0; i--) {
+        if(middleRow[i] == '1') {
+          // MOVE Z MOTOR
+          Serial.println("z-direction movement");
+          stepper1.moveRelativeInSteps(1024);
+        } else {
+          Serial.println("No z-direction movement");
+        }
+        // MOVE X MOTOR, AS LONG AS IT IS NOT LAST DOT
+        if(i != 0) {
+          Serial.println("x-direction movement (negative)");
+          stepper2.moveRelativeInSteps(-1024);
+        } else {
+          Serial.println("No x-direction movement");
+        }
+      } 
+
+      // MOVE Y MOTOR TO THE BOTTOM ROW
+      Serial.println("y-direction movement");
+      // stepper0.moveRelativeInSteps(2048);
+      
+      // BOTTOM ROW
+      for(int i = 0; i < 10; i++) {
+        if(bottomRow[i] == '1') {
+          // MOVE Z MOTOR
+          Serial.println("z-direction movement");
+          stepper1.moveRelativeInSteps(1024);
+        } else {
+          Serial.println("No z-direction movement");
+        }
+        // MOVE X MOTOR, AS LONG AS IT IS NOT LAST DOT
+        if(i != 9) {
+          Serial.println("x-direction movement");
+          stepper2.moveRelativeInSteps(1024);
+        } else {
+          Serial.println("No x-direction movement");
+        }
+      }
+      
+      // MOVE Y MOTOR BACK TO TOP ROW (2 TIMES PREV MOVEMENT DOWN)
+      Serial.println("y-direction movement (negative)");
+      stepper0.moveRelativeInSteps(4096);
     } 
 }
